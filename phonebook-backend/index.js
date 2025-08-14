@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
-let notes = [
+let persons = [
 	{
 		id: "1",
 		name: "Arto Hellas",
@@ -25,17 +26,17 @@ let notes = [
 ];
 
 app.get("/info", (req, res) => {
-	res.send(`<p>Phonebook has info for ${notes.length} people</p>
+	res.send(`<p>Phonebook has info for ${persons.length} people</p>
         <p>${new Date()}</p>`);
 });
 
 app.get("/api/persons", (req, res) => {
-	res.json(notes);
+	res.json(persons);
 });
 
 app.get("/api/persons/:id", (req, res) => {
     const id = req.params.id;
-    const note = notes.find((n) => n.id === id);
+    const note = persons.find((n) => n.id === id);
     
     if (note) {
         return res.json(note);
@@ -46,8 +47,18 @@ app.get("/api/persons/:id", (req, res) => {
 
 app.delete("/api/persons/:id", (req, res) => {
     const id = req.params.id;
-    notes = notes.filter(n => n.id !== id);
+    persons = persons.filter(n => n.id !== id);
     return res.status(204);
+})
+
+app.post("/api/persons", (req, res) => {
+	const person = req.body;	
+	const id = Math.floor(Math.random() * 9000000000000000);
+	person.id = id;
+
+	persons = [...persons, person];
+	res.json(person);
+	
 })
 
 const PORT = 3001;
