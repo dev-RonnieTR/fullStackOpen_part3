@@ -33,6 +33,17 @@ app.get("/api/persons", (req, res) => {
 	res.json(notes);
 });
 
+app.get("/api/persons/:id", (req, res) => {
+    const id = req.params.id;
+    const note = notes.find((n) => n.id === id);
+    
+    if (note) {
+        return res.json(note);
+    } else {
+        return res.status(400).json({ error: "content missing" });
+    }
+})
+
 const PORT = 3001;
 
 app.listen(PORT, () => {
