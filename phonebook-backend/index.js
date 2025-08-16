@@ -35,31 +35,46 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-    const id = req.params.id;
-    const note = persons.find((n) => n.id === id);
-    
-    if (note) {
-        return res.json(note);
-    } else {
-        return res.status(400).json({ error: "content missing" });
-    }
-})
+	const id = req.params.id;
+	const note = persons.find((n) => n.id === id);
+
+	if (note) {
+		return res.json(note);
+	} else {
+		return res.status(400).json({ error: "missing required property: number" });
+	}
+});
 
 app.delete("/api/persons/:id", (req, res) => {
-    const id = req.params.id;
-    persons = persons.filter(n => n.id !== id);
-    return res.status(204);
-})
+	const id = req.params.id;
+	persons = persons.filter((n) => n.id !== id);
+	return res.status(204);
+});
 
 app.post("/api/persons", (req, res) => {
-	const person = req.body;	
+	const person = req.body;
+
+	if (!person.name) {
+		return res.status(422).json({ error: "missing required property: name" });
+	}
+	if (!person.number) {
+		return res.status(422).json({ error: "missing required property: number" });
+	}
+
+	if (
+		persons.some(
+			(p) => p.name.toLocaleLowerCase() === person.name.toLocaleLowerCase()
+		)
+	) {
+		return res.status(409).json({ error: `${person.name} already exists` });
+	}
+
 	const id = Math.floor(Math.random() * 9000000000000000);
 	person.id = id;
 
 	persons = [...persons, person];
 	res.json(person);
-	
-})
+});
 
 const PORT = 3001;
 
