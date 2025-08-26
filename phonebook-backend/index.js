@@ -11,6 +11,7 @@ app.use(morgan((tokens, req, res) => [
 	tokens["response-time"](req, res), "ms",
 	req.method === "POST" ? JSON.stringify(req.body) : ""
 ].join(" ")))
+app.use(express.static("dist"))
 
 let persons = [
 	{
