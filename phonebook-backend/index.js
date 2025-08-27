@@ -59,7 +59,7 @@ app.get("/api/persons/:id", (req, res) => {
 app.delete("/api/persons/:id", (req, res) => {
 	const id = req.params.id;
 	persons = persons.filter((n) => n.id !== id);
-	return res.status(204);
+	return res.sendStatus(204);
 });
 
 app.post("/api/persons", (req, res) => {
