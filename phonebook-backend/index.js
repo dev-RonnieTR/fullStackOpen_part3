@@ -81,7 +81,7 @@ app.post("/api/persons", (req, res) => {
 	}
 
 	const id = Math.floor(Math.random() * 9000000000000000);
-	person.id = id;
+	person.id = String(id);
 
 	persons = [...persons, person];
 	res.json(person);
