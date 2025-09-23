@@ -7,9 +7,10 @@ if (process.argv.length < 3) {
 
 const [password, name, number] = process.argv.slice(2);
 
-const url = `mongodb+srv://ronaldoteran2407_db_user:${password}@cluster0.d8argvu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const url = ``;
 
 mongoose.set("strictQuery", false);
+
 
 mongoose.connect(url);
 
