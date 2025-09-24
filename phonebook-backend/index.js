@@ -55,17 +55,7 @@ app.get("/api/persons/:id", async (req, res, next) => {
 
 app.post("/api/persons", async (req, res, next) => {
 	const person = req.body;
-
-	if (!person.name) {
-		console.log("POST request rejected: no name was submitted");
-		return res.status(422).json({ error: "missing required property: name" });
-	}
-
-	if (!person.number) {
-		console.log("POST request rejected: no number was submitted");
-		return res.status(422).json({ error: "missing required property: number" });
-	}
-
+	
 	try {
 		if (await Contact.exists({ name: person.name })) {
 			console.log(

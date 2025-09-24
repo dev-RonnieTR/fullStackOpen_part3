@@ -5,16 +5,16 @@ mongoose.set("strictQuery", false);
 (async () => {
 	try {
 		await mongoose.connect(process.env.MONGODB_URI);
-        console.log("Connected to MongoDB")
+		console.log("Connected to MongoDB");
 	} catch (error) {
-        console.log("Error connecting to MongoDB:", error.message);
-        process.exit(1);
-    }
+		console.log("Error connecting to MongoDB:", error.message);
+		process.exit(1);
+	}
 })();
 
 const contactSchema = new mongoose.Schema({
-	name: String,
-	number: String,
+	name: { type: String, required: [true, "Name is required"] },
+	number: { type: String, required: [true, "Number is required"] },
 });
 
 contactSchema.set("toJSON", {
