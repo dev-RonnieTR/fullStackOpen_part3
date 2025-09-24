@@ -21,73 +21,39 @@ app.use(
 );
 app.use(express.static("dist"));
 
-/*
-let persons = [
-	{
-		id: "1",
-		name: "Arto Hellas",
-		number: "040-123456",
-	},
-	{
-		id: "2",
-		name: "Ada Lovelace",
-		number: "39-44-5323523",
-	},
-	{
-		id: "3",
-		name: "Dan Abramov",
-		number: "12-43-234345",
-	},
-	{
-		id: "4",
-		name: "Mary Poppendieck",
-		number: "39-23-6423122",
-	},
-];
-*/
-
-app.get("/info", async (req, res) => {
+app.get("/info", async (req, res, next) => {
 	try {
-		console.log("Fetching information...");
 		const count = await Contact.countDocuments({});
 		res.send(`<p>Phonebook has info for ${count} people</p>
 			<p>${new Date()}</p>`);
-		console.log("Fetch successful");
 	} catch (error) {
-		console.log("Error getting the requested information:", error.message);
-		res.status(500).send({ error: "something went wrong" });
+		next(error);
 	}
 });
 
-app.get("/api/persons", async (req, res) => {
+app.get("/api/persons", async (req, res, next) => {
 	try {
-		console.log("Fetching information...");
 		res.send(await Contact.find({}));
-		console.log("Fetch successful");
 	} catch (error) {
-		console.log("Error getting contacts", error.message);
-		res.status(500).send({ error: "something went wrong" });
+		next(error);
 	}
 });
 
-app.get("/api/persons/:id", async (req, res) => {
+app.get("/api/persons/:id", async (req, res, next) => {
 	try {
-		console.log("Fetching information by ID...");
 		const contact = await Contact.findById(req.params.id);
 		if (contact) {
-			console.log("Fetch successful");
 			res.json(contact);
 		} else {
 			console.log("No contact with that ID exists");
 			res.status(404).json({ error: "Contact not found" });
 		}
 	} catch (error) {
-		console.log("Error getting contact information:", error.message);
-		res.status(500).send({ error: "something went wrong" });
+		next(error);
 	}
 });
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
 	const person = req.body;
 
 	if (!person.name) {
@@ -96,7 +62,7 @@ app.post("/api/persons", async (req, res) => {
 	}
 
 	if (!person.number) {
-		console.log("POST request rejected: no name was submitted");
+		console.log("POST request rejected: no number was submitted");
 		return res.status(422).json({ error: "missing required property: number" });
 	}
 
@@ -113,31 +79,37 @@ app.post("/api/persons", async (req, res) => {
 			name: person.name,
 			number: person.number,
 		});
-		console.log("Saving contact to MongoDB...");
 		const savedContact = await contact.save();
 		console.log("Contact succesfully saved in MongoDB");
 		return res.json(savedContact);
 	} catch (error) {
-		console.log("Error creating contact:", error.message);
-		res.status(500).json({ error: "could not post to database" });
+		next(error);
 	}
 });
 
-app.delete("/api/persons/:id", async (req, res) => {
+app.delete("/api/persons/:id", async (req, res, next) => {
 	try {
-		if (!(await Contact.exists({ _id: req.params.id }))) {
-			console.log("Contact does not exist on the phonebook");
+		const deleted = await Contact.findByIdAndDelete(req.params.id);
+		if (!deleted) {
 			return res
 				.status(404)
-				.json({ error: "contact does not exist on the phonebook" });
+				.json({ error: "Contact does not exist on the phonebook" });
 		}
-		await Contact.deleteOne({ _id: req.params.id });
 		return res.status(204).end();
 	} catch (error) {
-		console.log("Error deleting the contact:", error.message);
-		return res.status(500).end();
+		next(error);
 	}
 });
+
+const errorHandler = (error, req, res, next) => {
+	if (error.name === "CastError")
+		return res.status(400).json({ error: error.message });
+	if (error.name === "ValidationError")
+		return res.status(400).json({ error: error.message });
+	next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 
