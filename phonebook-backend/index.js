@@ -53,9 +53,24 @@ app.get("/api/persons/:id", async (req, res, next) => {
 	}
 });
 
+app.put("/api/persons/:id", async (req, res, next) => {
+	const { name, number } = req.body;
+
+	try {
+		const contact = await Contact.findById(req.params.id);
+		if (!contact) return res.status(404).end();
+		contact.name = name;
+		contact.number = number;
+		const updatedContact = await contact.save();
+		return res.status(200).json(updatedContact);
+	} catch (error) {
+		next(error);
+	}
+});
+
 app.post("/api/persons", async (req, res, next) => {
 	const person = req.body;
-	
+
 	try {
 		if (await Contact.exists({ name: person.name })) {
 			console.log(
@@ -93,7 +108,7 @@ app.delete("/api/persons/:id", async (req, res, next) => {
 
 const errorHandler = (error, req, res, next) => {
 	if (error.name === "CastError")
-		return res.status(400).json({ error: error.message });
+		return res.status(400).json({ error: "malformatted ID"});
 	if (error.name === "ValidationError")
 		return res.status(400).json({ error: error.message });
 	next(error);
