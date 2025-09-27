@@ -13,8 +13,8 @@ mongoose.set("strictQuery", false);
 })();
 
 const contactSchema = new mongoose.Schema({
-	name: { type: String, required: [true, "Name is required"] },
-	number: { type: String, required: [true, "Number is required"] },
+	name: { type: String, required: [true, "Name is required"], minLength: [3, "Name must be at least 3 characters long"] },
+	number: { type: String, required: [true, "Number is required"], minLength: [3, "Number must be at least 3 characters long"]},
 });
 
 contactSchema.set("toJSON", {
